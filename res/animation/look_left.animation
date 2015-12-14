@@ -1,0 +1,6 @@
+source = "res/images/sprites/link_spritesheet.png"
+name = "Look Left"
+sequence = {(1 0)}
+sprite_width = 32
+sprite_height = 41
+frames_per_image = 1

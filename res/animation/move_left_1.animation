@@ -1,0 +1,6 @@
+source = "res/images/sprites/link_spritesheet.png"
+name = "Move Left 1"
+sequence = {(1 3),(1 4),(1 4),(1 5),(1 6),(1 6),(1 7),(1 1)}
+sprite_width = 32
+sprite_height = 41
+frames_per_image = 1

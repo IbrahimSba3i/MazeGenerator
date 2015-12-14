@@ -1,0 +1,6 @@
+source = "res/images/sprites/link_spritesheet.png"
+name = "Move Down 2"
+sequence = {(0 8),(0 9),(0 9),(0 10),(0 11),(0 11),(0 12),(0 1)}
+sprite_width = 32
+sprite_height = 41
+frames_per_image = 1

@@ -1,0 +1,6 @@
+source = "res/images/sprites/coin.png"
+name = "Rotate Coin"
+sequence = {(0 0),(0 1),(0 2),(0 3),(0 4),(0 5)}
+sprite_width = 27
+sprite_height = 27
+frames_per_image = 4

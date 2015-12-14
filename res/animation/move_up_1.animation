@@ -1,0 +1,6 @@
+source = "res/images/sprites/link_spritesheet.png"
+name = "Move Up 1"
+sequence = {(2 3),(2 4),(2 4),(2 5),(2 6),(2 6),(2 7),(2 1)}
+sprite_width = 32
+sprite_height = 41
+frames_per_image = 1
