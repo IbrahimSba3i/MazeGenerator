@@ -28,7 +28,8 @@ public class TexturesManager {
 			"ground.png",
 			"ground.png",
 	};
-
+	private Texture endPointTexture;
+	
 	private TexturesManager() {
 		tileTextures = new Texture[tileNames.length];
 		
@@ -51,5 +52,17 @@ public class TexturesManager {
 	
 	public Texture getTileTexture(int index) {
 		return tileTextures[index];
+	}
+
+	public Texture getEndTexture() {
+		if(endPointTexture == null) {
+			try {
+				endPointTexture = new Texture();
+				endPointTexture.loadFromFile(FileSystems.getDefault().getPath(DirectoryManager.getSpritesPath(), "point0.png"));
+			} catch (IOException e) {
+				System.out.println("Couldn't load texture");
+			}
+		}
+		return endPointTexture;
 	}
 }

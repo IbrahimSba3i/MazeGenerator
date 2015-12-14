@@ -11,6 +11,8 @@ public class MazeInformation implements Comparable<MazeInformation> {
 	
 	public List<Boolean> chromosome;
 	
+	public List<Vector2i> coinsPositions;
+	
 	public double totalError;
 	public double fitness;
 	
@@ -29,6 +31,7 @@ public class MazeInformation implements Comparable<MazeInformation> {
 	public int shortestPathLength;
 	public int targetShortestPathLength;
 	public List<Vector2i> shortestPath;
+	public List<Vector2i> reachablePoints;
 	public double shortestPathError;
 	
 	public int wallsCount;
@@ -45,14 +48,17 @@ public class MazeInformation implements Comparable<MazeInformation> {
 	public MazeInformation() {
 		boardMatrixInitialized = false;
 		shortestPath = new ArrayList<>();
+		reachablePoints = new ArrayList<>();
 	}
 	
 	public void createBoard() {
 		boardMatrixInitialized = true;
 		BoardCreator generator = new BoardCreator();
 		boardValues = generator.getBoardFromList(chromosome);
+		coinsPositions = generator.getCoinsList();
+		reachablePoints = generator.getReachabilityList();
 	}
-	
+		
 	public int getCell(int x, int y) {
 		if(!boardMatrixInitialized) {
 			createBoard();

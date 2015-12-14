@@ -53,16 +53,6 @@ public class MazeGenerationLoadingWindow extends GameWindow implements ProgressO
 	@Override
 	protected void createWindowContent() {
 		
-		plainBackground = new RectangleShape();
-		plainBackground.setSize(new Vector2f(getWindowWidth(), getWindowHeight()));
-		plainBackground.setFillColor(GameManager.getGreyColor());
-		addElement(plainBackground);
-		
-		loadingRectangle = new RectangleShape();
-		loadingRectangle.setFillColor(GameManager.getBlueColor());
-		loadingRectangle.setPosition((getWindowWidth() - maxLoadingBarSize) / 2, 436);
-		loadingRectangle.setSize(new Vector2f(0, 65));
-		addElement(loadingRectangle);
 		
 		Texture texture = new Texture();
 		try {
@@ -71,8 +61,25 @@ public class MazeGenerationLoadingWindow extends GameWindow implements ProgressO
 			System.out.println("Couldn't load loading texture");
 		}
 		
+		Vector2f scaleFactor = new Vector2f((float)getWindowWidth() / texture.getSize().x,  (float) getWindowHeight() / texture.getSize().y);
+		
+		plainBackground = new RectangleShape();
+		plainBackground.setSize(new Vector2f(getWindowWidth(), getWindowHeight()));
+		plainBackground.setFillColor(GameManager.getGreyColor());
+		plainBackground.setScale(scaleFactor);
+		addElement(plainBackground);
+		
+		loadingRectangle = new RectangleShape();
+		loadingRectangle.setFillColor(GameManager.getBlueColor());
+		loadingRectangle.setPosition((getWindowWidth() - maxLoadingBarSize * scaleFactor.x) / 2, 436);
+		loadingRectangle.setSize(new Vector2f(0, 65));
+		loadingRectangle.setScale(scaleFactor);
+		addElement(loadingRectangle);
+
+		
 		backgroundImage = new Sprite();
 		backgroundImage.setTexture(texture);
+		backgroundImage.setScale(scaleFactor);
 		addElement(backgroundImage);
 		
 		

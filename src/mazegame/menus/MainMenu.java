@@ -79,6 +79,7 @@ public class MainMenu extends GameWindow implements Menu {
 		}
 		backgroundImage = new Sprite();
 		backgroundImage.setTexture(texture);
+		backgroundImage.setScale((float)getWindowWidth() / texture.getSize().x,  (float) getWindowHeight() / texture.getSize().y);
 		addElement(backgroundImage);
 		
 		menuItems = new ArrayList<Text>();

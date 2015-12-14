@@ -30,6 +30,11 @@ public abstract class Globals {
 	public static final double ERROR_CHECKERBOARD = 0.00;
 	
 	public static final boolean REMOVE_USELESS_BLOCKS = false;
+	public static final int MAX_TIME = 40;
+	public static final boolean DIAGONALS_BFS = false;
+	public static final int COIN_SCORE = 10;
+	public static final float SCORE_POSITION_Y = 300;
+	public static final float TIMER_POSITION_WAY = 50;
 
 	public static int PLAYER_X = 1;
 	public static int PLAYER_Y = 1;
@@ -45,13 +50,14 @@ public abstract class Globals {
 	public static double MEDIUM_WALLS_RATIO = 0.45;
 	public static double HARD_WALLS_RATIO = 0.45;
 	
+	public static int COINS_COUNT = 10;
 
 	public static void resetPositins() {
 		do {
-			PLAYER_X = Utility.rand().nextInt(TILES_COLS - 1) + 1;
-			TARGET_X = Utility.rand().nextInt(TILES_COLS - 1) + 1;
-			PLAYER_Y = Utility.rand().nextInt(TILES_ROWS - 1) + 1;
-			TARGET_Y = Utility.rand().nextInt(TILES_ROWS - 1) + 1;
+			PLAYER_X = Utility.rand().nextInt(TILES_COLS - 2) + 1;
+			TARGET_X = Utility.rand().nextInt(TILES_COLS - 2) + 1;
+			PLAYER_Y = Utility.rand().nextInt(TILES_ROWS - 2) + 1;
+			TARGET_Y = Utility.rand().nextInt(TILES_ROWS - 2) + 1;
 		} while(Math.abs(PLAYER_X - TARGET_X) + Math.abs(PLAYER_Y - TARGET_Y) < Math.min(TILES_COLS, TILES_ROWS));
 	}
 }

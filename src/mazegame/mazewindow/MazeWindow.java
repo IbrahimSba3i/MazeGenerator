@@ -6,8 +6,8 @@ import gamewindow.system.GameWindow;
 import java.util.ArrayList;
 import java.util.List;
 
-import mazegame.Globals;
 import mazegame.GameManager;
+import mazegame.Globals;
 import mazegame.TexturesManager;
 import mazegame.generator.MazeInformation;
 
@@ -15,6 +15,7 @@ import org.jsfml.graphics.Color;
 import org.jsfml.graphics.RectangleShape;
 import org.jsfml.graphics.Sprite;
 import org.jsfml.graphics.Text;
+import org.jsfml.system.Clock;
 import org.jsfml.system.Vector2f;
 import org.jsfml.system.Vector2i;
 import org.jsfml.window.Keyboard;
@@ -24,14 +25,19 @@ public class MazeWindow extends GameWindow {
 	private Sprite[][] board;
 	
 	private Player player;
-	private Coin coin;
+	private List<Coin> coins;
 	
 	private Vector2i playerPosition;
 	private Vector2i targetPosition;
 
-	private Text text;
+	private Text youWonText;
+	private Text youLostText;
+
 	private RectangleShape shade;
-	private boolean gameFinished;
+	private boolean gameWon;
+	private boolean gameLost;
+	
+	private Sprite endPoint;
 	
 	private MazeInformation mazeInformation;
 	
@@ -39,10 +45,21 @@ public class MazeWindow extends GameWindow {
 	private Text stats;
 	
 	private List<RectangleShape> path;
+	private List<RectangleShape> reach;
 	
 	private boolean pathShown;
 	private boolean consoleOpened;
-
+	private boolean reachabilityShown;
+	
+	private Clock clk;
+	private Text timer;
+	private RectangleShape bgPart;
+	
+	private Text score;
+	private int scoreCounter;
+	
+	private int counter;
+	
 	public MazeWindow(GameWindow parent, MazeInformation mazeInformation) {
 		super(parent);
 		this.mazeInformation = mazeInformation;
@@ -72,25 +89,76 @@ public class MazeWindow extends GameWindow {
 				addElement(board[i][j]);
 			}
 		}
-
-		gameFinished = false;
+		
+		
+		
+		clk = new Clock();
+		
+		counter = (int) (Globals.MAX_TIME - clk.getElapsedTime().asSeconds());
+		
+		timer = new Text();
+		timer.setCharacterSize(40);
+		timer.setFont(GameManager.getFont());
+		timer.setColor(GameManager.getBlueColor());
+		timer.setString(String.valueOf(counter));
+		timer.setOrigin(timer.getGlobalBounds().width / 2, timer.getGlobalBounds().height / 2);
+		timer.setPosition(Globals.WINDOW_WIDTH + (getWindowWidth() - Globals.WINDOW_WIDTH) / 2, Globals.TIMER_POSITION_WAY);
+		
+		scoreCounter = 0;
+		score = new Text();
+		score.setCharacterSize(40);
+		score.setFont(GameManager.getFont());
+		score.setColor(GameManager.getBlueColor());
+		score.setString(String.valueOf(scoreCounter));
+		score.setOrigin(score.getGlobalBounds().width / 2, score.getGlobalBounds().height / 2);
+		score.setPosition(Globals.WINDOW_WIDTH + (getWindowWidth() - Globals.WINDOW_WIDTH) / 2, Globals.SCORE_POSITION_Y);
+		
+		
+		bgPart = new RectangleShape();
+		bgPart.setSize(new Vector2f(getWindowWidth() - Globals.WINDOW_WIDTH, getWindowHeight()));
+		bgPart.setPosition(Globals.WINDOW_WIDTH, 0);
+		bgPart.setFillColor(GameManager.getGreyColor());
+		
+		addElement(bgPart);
+		addElement(timer);
+		addElement(score);
+		
+		gameWon = false;
 		pathShown = false;
+		reachabilityShown = false;
 		consoleOpened = false;
 		
 		player = new Player();
 		player.setPosition(new Vector2f(Globals.TILE_WIDTH * playerPosition.x, Globals.TILE_HEIGHT * playerPosition.y - (Globals.PAYER_HEIGHT - Globals.TILE_HEIGHT)));
 		addElement(player);
-
-		coin = new Coin();
-		coin.setPosition(new Vector2f(Globals.TILE_WIDTH * targetPosition.x + (Globals.TILE_WIDTH - Globals.COIN_WIDTH) / 2, Globals.TILE_HEIGHT * targetPosition.y + (Globals.TILE_HEIGHT - Globals.COIN_HEIGHT) / 2));
-		addElement(coin);
 		
-		text = new Text();
-		text.setCharacterSize(40);
-		text.setColor(Color.WHITE);
-		text.setString("Level Complete");
-		text.setFont(GameManager.getFont());
-		text.setPosition((getWindowWidth() - text.getGlobalBounds().width)/2 , (getWindowHeight() - text.getGlobalBounds().height)/2);
+		coins = new ArrayList<Coin>();
+		for(int i = 0; i <Globals.COINS_COUNT; i++) {
+			Coin coin = new Coin();
+			coin.setPosition(new Vector2f(	Globals.TILE_WIDTH * mazeInformation.coinsPositions.get(i).x + (Globals.TILE_WIDTH - Globals.COIN_WIDTH) / 2,
+											Globals.TILE_HEIGHT * mazeInformation.coinsPositions.get(i).y + (Globals.TILE_HEIGHT - Globals.COIN_HEIGHT) / 2));
+			coins.add(coin);
+			addElement(coin);
+		}
+		
+		endPoint = new Sprite();
+		endPoint.setTexture(TexturesManager.getInstance().getEndTexture());
+		endPoint.setPosition(targetPosition.x * Globals.TILE_WIDTH, targetPosition.y * Globals.TILE_HEIGHT);
+		addElement(endPoint);
+		
+		youWonText = new Text();
+		youWonText.setCharacterSize(40);
+		youWonText.setColor(Color.WHITE);
+		youWonText.setString("You Won");
+		youWonText.setFont(GameManager.getFont());
+		youWonText.setPosition((getWindowWidth() - youWonText.getGlobalBounds().width)/2 , (getWindowHeight() - youWonText.getGlobalBounds().height)/2);
+
+		youLostText = new Text();
+		youLostText.setCharacterSize(40);
+		youLostText.setColor(Color.WHITE);
+		youLostText.setString("You Lost");
+		youLostText.setFont(GameManager.getFont());
+		youLostText.setPosition((getWindowWidth() - youLostText.getGlobalBounds().width)/2 , (getWindowHeight() - youLostText.getGlobalBounds().height)/2);
 
 		shade = new RectangleShape();
 		shade.setSize(new Vector2f(getWindowWidth(), getWindowHeight()));
@@ -105,6 +173,18 @@ public class MazeWindow extends GameWindow {
 			sp.setSize(new Vector2f(Globals.TILE_WIDTH, Globals.TILE_HEIGHT));
 			path.add(sp);
 		}
+		
+		reach = new ArrayList<RectangleShape>();
+		for(int i = 0; i < mazeInformation.reachablePoints.size(); i++) {
+			Vector2i point = mazeInformation.reachablePoints.get(i);
+			RectangleShape sp = new RectangleShape();
+			sp.setPosition(point.x * Globals.TILE_WIDTH, point.y * Globals.TILE_HEIGHT);
+			sp.setFillColor(new Color(255, 255, 0, 70));
+			sp.setSize(new Vector2f(Globals.TILE_WIDTH, Globals.TILE_HEIGHT));
+			reach.add(sp);
+		}
+		
+		
 		
 		console = new RectangleShape();
 		console.setSize(new Vector2f(getWindowWidth(), getWindowHeight()));
@@ -132,6 +212,18 @@ public class MazeWindow extends GameWindow {
 						}
 						pathShown = false;
 					}
+				} else if(key == Key.R) {
+					if(!reachabilityShown) {
+						for(RectangleShape shape : reach) {
+							addElement(shape);
+						}
+						reachabilityShown = true;
+					} else {
+						for(RectangleShape shape : reach) {
+							removeElement(shape);
+						}
+						reachabilityShown = false;
+					}
 				} else if(key == Key.C) {
 					if(!consoleOpened) {
 						addElement(console);
@@ -151,8 +243,9 @@ public class MazeWindow extends GameWindow {
 
 	@Override
 	protected void update() {
-
-		if(!gameFinished) {
+		
+		if(!gameWon && !gameLost) {
+			
 			if(Keyboard.isKeyPressed(Key.UP)) {
 				if(!player.isAnimationPlaying()) {
 					if(playerPosition.y > 0 && mazeInformation.getCell(playerPosition.x, playerPosition.y - 1) == Globals.GROUND) {
@@ -197,17 +290,48 @@ public class MazeWindow extends GameWindow {
 				}
 			}
 			
+			for(int i = 0; i < mazeInformation.coinsPositions.size(); i++) {
+				if(mazeInformation.coinsPositions.get(i).x == playerPosition.x && mazeInformation.coinsPositions.get(i).y == playerPosition.y) {
+					removeElement(coins.get(i));
+					mazeInformation.coinsPositions.remove(i);
+					coins.remove(i);
+					scoreCounter +=Globals.COIN_SCORE;
+					score.setString(String.valueOf(scoreCounter));
+					score.setOrigin(score.getGlobalBounds().width / 2, score.getGlobalBounds().height / 2);
+					break;
+				}
+			}
+			
 			if(playerPosition.x == targetPosition.x && playerPosition.y == targetPosition.y) {
-				gameFinished = true;
-				removeElement(coin);
+				gameWon = true;
+				removeElement(endPoint);
 				addElement(shade);
-				addElement(text);
+				addElement(youWonText);
 				setKeyPressedListener(new KeyPressedListener() {
 					@Override
 					public void onKeyPressed(Key key, boolean alt, boolean control, boolean shift, boolean system) {
 						close();
 					}
 				});
+			}
+		}
+		
+		if(!gameLost && !gameWon) {
+			counter = (int) (Globals.MAX_TIME - clk.getElapsedTime().asSeconds());
+			timer.setString(String.valueOf(counter));
+			timer.setOrigin(timer.getGlobalBounds().width / 2, timer.getGlobalBounds().height / 2);
+			
+			if(counter == 0) {
+				gameLost = true;
+				addElement(shade);
+				addElement(youLostText);
+				setKeyPressedListener(new KeyPressedListener() {
+					@Override
+					public void onKeyPressed(Key key, boolean alt, boolean control, boolean shift, boolean system) {
+						close();
+					}
+				});
+
 			}
 		}
 
