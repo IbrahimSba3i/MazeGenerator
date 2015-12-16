@@ -90,8 +90,6 @@ public class GeneticAlgorithmsMazeGenerator {
 	}
 
 	public void initializeGenerationReplacement() {
-		//generationReplacement = new BestOfFourReplacement<>();
-		// generationReplacement = new ChildrenReplacement<>();
 		generationReplacement = new FullyConnectedReplacement<>();
 	}
 
